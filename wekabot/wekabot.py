@@ -20,10 +20,6 @@ def main():
     parser.add_argument('--java_o', action='store', dest='java_options', type=str, help="java options (Xmx4g)")
     parser.add_argument('source_files', action='store', nargs="*", type=os.path.abspath, help="Paths of source files")
     args = vars(parser.parse_args())
-    print args
-
-
-
 
     #Set defaults as fallback arguments.
     defaults = defaultdict(dict)
@@ -51,7 +47,6 @@ def main():
         sys.stderr.write('Missing weka jar path\n')
         sys.exit(1)
 
-
     #If no file paths are supplied
     # if len(args['source_files']) == 0:
     #     sys.stderr.write('Please supply at least one file to analyze\n')
@@ -67,33 +62,28 @@ def main():
 
 
     now = datetime.datetime.now()
-    sys.stdout.write("Beginning analysis - {}".format(now.ctime()))
+    print "Beginning analysis - {}".format(now.ctime())
     process_times = []
 
     for file_path in args['source_files']:
 
-
         command = 'java {} -classpath {} {} -t {} {}'.format(
                 java_options,
                 weka_jar_path,
-                # weka_reader_path,
                 args['a'],
                 file_path,
                 algorithm_options
                 )
 
-        print
-        print command
-        print
         start = datetime.datetime.now()
+        print "Now starting - {}".format(file_path)
         e = envoy.run(command)
 
         if e.status_code == 0:
-
-            sys.stdout.write(e.std_out+"\n")
+            sys.stdout.write(e.std_out)
             end = datetime.datetime.now()
-            process_times.append( (file_path, ars['a'], start, end) )
-            sys.stdout.write("{} processed successfully, total seconds: \n".format(file_path, (start-end).total_seconds() ))
+            process_times.append( (file_path, args['a'], start, end) )
+            print "{} processed successfully, total seconds: {}\n".format(file_path, (end-start).total_seconds() )
         else:
             sys.stderr.write("Error processing {}\n".format(file_path))
             sys.stderr.write(e.std_err+'\n'+e.std_out)
